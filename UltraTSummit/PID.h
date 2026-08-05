@@ -38,7 +38,7 @@ void calculoErroSensor() {
   leituraSensores();
 
   // Peso para cada sensor: esquerda negativo, direita positivo
-  float peso[] = {-3, -2, 2, 3}; 
+  float peso[] = {-4, -2, 2, 4}; 
   float soma_pesos = 0;
   int ativos = 0;
 
