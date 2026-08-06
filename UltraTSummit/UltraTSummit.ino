@@ -29,7 +29,7 @@ void setup() {
 }
 
 void LED_Estrategias() {
-uint32_t cores[7] = {
+  uint32_t cores[7] = {
     pixels.Color(0,125,125),   // 1 — (iSeeYou)
     pixels.Color(0,125,125),   // 2 — (Whiplash)
     pixels.Color(0,125,125),   // 3 — (Sharingan)
@@ -85,7 +85,8 @@ void loop() {
     ledLight(0, 255, 0); // LED verde = combate ativo
 
     switch (seletorEstrategia.estrategiaAtual()) {
-      case ESTRATEGIA_1: iSeeYou();          break;
+      // case ESTRATEGIA_1: iSeeYou();          break;
+      case ESTRATEGIA_1: BOBO();          break;
       case ESTRATEGIA_2: whiplash();         break;
       case ESTRATEGIA_3: Sharingan();        break;
       case ESTRATEGIA_4: SeekAndDestroy_L(); break;
@@ -94,28 +95,18 @@ void loop() {
       case ESTRATEGIA_0: Calibragem();       break;
     }
   }
-
-    
-    else if (moduloStart.preparado()) {
-      Serial.println("(PREPARAR recebido novamente — ja preparado)"); // não retirar essa linha (aparentemente dá erro para iniciar com o IR
-    } 
-    
-    else if (moduloStart.emCombate()) { // número 2 no controle
-      pixels.clear();
-      ledLight(0, 125, 0);
-     Serial.println(seletorEstrategia.nomeAtual());
-    }
-    else if (moduloStart.parado()) { // número 3 no controle
-      motor.clear_moving();  // Limpa fila de movimentos pendentes
-      motor.stop();
-      pixels.clear();
-      Serial.println("-> sumo stop");
-    }
+  else if (moduloStart.preparado()) {
+    Serial.println("(PREPARAR recebido novamente — ja preparado)"); // não retirar essa linha (aparentemente dá erro para iniciar com o IR
   }
-
-
-// ─────────────────────────────────────────────────────────────
-//  Feedback visual no anel de LEDs conforme estratégia atual
-// ─────────────────────────────────────────────────────────────
-
-
+  else if (moduloStart.emCombate()) { // número 2 no controle
+    pixels.clear();
+    ledLight(0, 125, 0);
+    Serial.println(seletorEstrategia.nomeAtual());
+  }
+  else if (moduloStart.parado()) { // número 3 no controle
+    motor.clear_moving();  // Limpa fila de movimentos pendentes
+    motor.stop();
+    pixels.clear();
+    Serial.println("-> sumo stop");
+  }
+}

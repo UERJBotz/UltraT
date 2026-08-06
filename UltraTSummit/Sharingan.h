@@ -1,7 +1,7 @@
 #ifndef Sharingan_H
 #define Sharingan_H
 
-#include "Sensores.h"
+#include "sensores.h"
 #include "PID.h"
 #include "Whiplash.h"
 

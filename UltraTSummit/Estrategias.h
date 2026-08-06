@@ -3,6 +3,8 @@
 
 #include "PID.h"
 
+#define VEL_SEEK 600
+
 void paraTras() { // estratégia número 6 no controle
   // Usa timers não-bloqueantes em vez de delay()
   // Move para frente por 500ms, depois para trás por 350ms, depois executa iSeeYou
@@ -52,6 +54,69 @@ void SeekAndDestroy_R(){ // estratégia número 5 no controle — busca pela lat
     Serial.println("SeekAndDestroy_R: semicirculo concluido -> PID (iSeeYou)");
   }
   iSeeYou();
+}
+
+
+
+void BOBO() {
+  leituraSensores();
+
+  enum ESTADO_BOBO {
+    BOBO_SEM_INIMIGO,
+    BOBO_INIMIGO_FRENTE,
+    BOBO_INIMIGO_ESQ,
+    BOBO_INIMIGO_FRENTE_ESQ,
+    BOBO_INIMIGO_DIR,
+    BOBO_INIMIGO_FRENTE_DIR,
+  } estadoAtual = BOBO_SEM_INIMIGO; // sem inimigo
+  
+  // if (   leitura[0]
+  //     && leitura[1]
+  //     && leitura[2]
+  //     && leitura[3]) { //enxergando com todos
+  //   EstadoAtual = BOBO_INIMIGO_FRENTE;
+  // } else
+  if        (leitura[1] && leitura[2]) { //enxergando com os sensores frontais
+    estadoAtual = BOBO_INIMIGO_FRENTE;
+  } else if (leitura[1]) { // enxergando com o esquerdo frente
+    estadoAtual = BOBO_INIMIGO_FRENTE_ESQ;
+  } else if (leitura[2]) { // enxergando com o direito fente
+    estadoAtual = BOBO_INIMIGO_FRENTE_DIR;
+  } else if (leitura[0]) { // enxergando com o esquerdo
+    estadoAtual = BOBO_INIMIGO_ESQ;
+  } else if (leitura[3]) { // enxergando com o direito
+    estadoAtual = BOBO_INIMIGO_DIR;
+  } else {
+    estadoAtual = BOBO_SEM_INIMIGO; // sem inimigo
+  }
+
+  switch (estadoAtual){
+    case BOBO_INIMIGO_ESQ:
+      Serial.println("Left Detected!");
+      motor.move(-VEL_SEEK, VEL_SEEK);
+      break;
+
+    case BOBO_INIMIGO_FRENTE_ESQ:
+      Serial.println("Left Soft Detected!");
+      motor.move(VEL_SEEK/2, VEL_SEEK);
+      break;
+
+    case BOBO_INIMIGO_FRENTE:
+      Serial.println("ROBOT ATTACK!");
+      motor.move(1023, 1023);
+      break;
+
+    case BOBO_INIMIGO_FRENTE_DIR:
+      Serial.println("Left Soft Detected!");
+      motor.move(VEL_SEEK, VEL_SEEK/2);
+      break;
+
+    case BOBO_SEM_INIMIGO:
+    case BOBO_INIMIGO_DIR:
+      Serial.println("Right Detected!");
+      motor.move(VEL_SEEK, -VEL_SEEK);
+      break;
+  }
 }
 
 #endif

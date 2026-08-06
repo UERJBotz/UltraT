@@ -1,6 +1,6 @@
 #ifndef ledFX_H
 #define ledFX_H
-#include "pid.h"
+#include "PID.h"
 #include <Adafruit_NeoPixel.h>
 
 #define LED4 3
