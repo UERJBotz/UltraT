@@ -62,9 +62,9 @@
 #include <Preferences.h>   // NVS — memória flash não volátil do ESP32
 
 // ─── Pinos ───────────────────────────────────────────────────
-#define IR_RECV_PIN      15   // Receptor IR (TSOP4838 / VS1838B)
+#define IR_RECV_PIN     15   // Receptor IR (TSOP4838 / VS1838B)
 #define LED_STATUS_PIN   2   // LED de status (pino 2 reservado para NeoPixel)
-#define BTN_LEARN_PIN     0   // Botão BOOT — entra no modo aprendizado
+#define BTN_LEARN_PIN    0   // Botão BOOT — entra no modo aprendizado
 // ─────────────────────────────────────────────────────────────
 
 // ─── Parâmetros ──────────────────────────────────────────────
@@ -150,7 +150,6 @@ public:
     }
 
     switch (_estado) {
-
       // ── Aguarda PREPARAR ───────────────────────────────────
       case START_DESLIGADO:
         digitalWrite(LED_STATUS_PIN, LOW);
