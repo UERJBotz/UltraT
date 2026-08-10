@@ -56,8 +56,6 @@ void SeekAndDestroy_R(){ // estratégia número 5 no controle — busca pela lat
   iSeeYou();
 }
 
-
-
 void BOBO() {
   leituraSensores();
 

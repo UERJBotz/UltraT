@@ -5,8 +5,7 @@
 #include "sensores.h"
 #include "DRV8833.h"
 
-DRV8833 motor(18, 19, 4, 23); // caçadora 19, 18, 23, 4 // ultra t 19, 18, 23, 4
-
+DRV8833 motor(4, 23, 18, 19);
 
 // Leitura dos sensores
 int leitura[4]; // [0]=esq, [1]=frente-esq, [2]=frente-dir, [3]=dir
@@ -38,7 +37,7 @@ void calculoErroSensor() {
   leituraSensores();
 
   // Peso para cada sensor: esquerda negativo, direita positivo
-  float peso[] = {-3, -2, 2, 3}; 
+  float peso[] = {-4, -2, 2, 4};
   float soma_pesos = 0;
   int ativos = 0;
 
@@ -86,19 +85,19 @@ void iSeeYou() { // não é uma estratégia e sim o ataque principal, mas pode s
     return;
   }
 
-  int velocidade_esq =  - PID;
-  int velocidade_dir =  + PID;
+  int velocidade_esq =  + PID;
+  int velocidade_dir =  - PID;
 
   velocidade_esq = constrain(velocidade_esq, -1023, 1023);
   velocidade_dir = constrain(velocidade_dir, -1023, 1023);
 
-  
-  if (PID == 0) {
+  if (PID == 0) { //! epsilon
     motor.move(1023, 1023); // alvo detectado e perfeitamente centralizado -> avança em linha reta
   } else {
     motor.move(velocidade_esq, velocidade_dir);
   }
 }
+
 void Calibragem() { // MODO TESTE DE CALIBRAGEM DO PID
   leituraSensores();
   pid();
@@ -114,7 +113,6 @@ void Calibragem() { // MODO TESTE DE CALIBRAGEM DO PID
   velocidade_esq = constrain(velocidade_esq, -1023, 1023);
   velocidade_dir = constrain(velocidade_dir, -1023, 1023);
 
-  
   if (PID == 0) {
     motor.stop();
   } else {
