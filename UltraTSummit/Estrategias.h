@@ -56,7 +56,7 @@ void SeekAndDestroy_R(){ // estratégia número 5 no controle — busca pela lat
   iSeeYou();
 }
 
-void BOBO() {
+void estadosBobo() {
   leituraSensores();
 
   enum ESTADO_BOBO {
@@ -67,13 +67,7 @@ void BOBO() {
     BOBO_INIMIGO_DIR,
     BOBO_INIMIGO_FRENTE_DIR,
   } estadoAtual = BOBO_SEM_INIMIGO; // sem inimigo
-  
-  // if (   leitura[0]
-  //     && leitura[1]
-  //     && leitura[2]
-  //     && leitura[3]) { //enxergando com todos
-  //   EstadoAtual = BOBO_INIMIGO_FRENTE;
-  // } else
+
   if        (leitura[1] && leitura[2]) { //enxergando com os sensores frontais
     estadoAtual = BOBO_INIMIGO_FRENTE;
   } else if (leitura[1]) { // enxergando com o esquerdo frente
@@ -86,9 +80,9 @@ void BOBO() {
     estadoAtual = BOBO_INIMIGO_DIR;
   } else {
     estadoAtual = BOBO_SEM_INIMIGO; // sem inimigo
-  }
+  } //! faltam algumas combinações aqui
 
-  switch (estadoAtual){
+  switch (estadoAtual) {
     case BOBO_INIMIGO_ESQ:
       Serial.println("Left Detected!");
       motor.move(-VEL_SEEK, VEL_SEEK);

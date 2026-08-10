@@ -86,7 +86,7 @@ void loop() {
 
     switch (seletorEstrategia.estrategiaAtual()) {
       case ESTRATEGIA_1: iSeeYou();          break;
-      case ESTRATEGIA_2: BOBO();          break;
+      case ESTRATEGIA_2: estadosBobo();      break;
       // case ESTRATEGIA_2: whiplash();         break;
       case ESTRATEGIA_3: Sharingan();        break;
       case ESTRATEGIA_4: SeekAndDestroy_L(); break;
