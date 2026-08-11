@@ -98,7 +98,7 @@ void iSeeYou() { // não é uma estratégia e sim o ataque principal, mas pode s
   }
 }
 
-void Calibragem() { // MODO TESTE DE CALIBRAGEM DO PID
+void Calibragem() { // MODO TESTE DE CALIBRAMENTO DO PID
   leituraSensores();
   pid();
 
