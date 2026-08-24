@@ -56,7 +56,7 @@
 #define MODULO_START_H
 
 #include <Arduino.h>
-#include <IRremoteESP8266.h>
+#include <IRremoteESP8266.h> // v2.9.0
 #include <IRrecv.h>
 #include <IRutils.h>
 #include <Preferences.h>   // NVS — memória flash não volátil do ESP32

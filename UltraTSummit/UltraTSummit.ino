@@ -16,7 +16,7 @@
 #include "ModuloStart.h"
 #include "SeletorEstrategia.h"
 
-#define boot 0
+#define BOOT 0
 
 void setup() {
   Serial.begin(115200);
@@ -25,7 +25,7 @@ void setup() {
   setupSensores();
   pixels.begin();
   pixels.setBrightness(40); // 0 (apagado) a 255 (máximo) — ajuste aqui pra calibrar o brilho
-  pinMode(boot, INPUT_PULLUP);
+  pinMode(BOOT, INPUT_PULLUP);
 }
 
 void LED_Estrategias() {

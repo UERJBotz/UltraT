@@ -9,7 +9,7 @@ void paraTras() { // estratégia número 6 no controle
   // Usa timers não-bloqueantes em vez de delay()
   // Move para frente por 500ms, depois para trás por 350ms, depois executa iSeeYou
   motor.move_for_then(1023, 1023, 500,
-                      -1023, 1023, 350);
+                     -1023, 1023, 350);
   iSeeYou();
 }
 
