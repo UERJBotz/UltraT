@@ -2,10 +2,10 @@
 #define pid_H
 
 
-#include "sensores.h"
+#include "placa.h"
 #include "DRV8833.h"
 
-DRV8833 motor(4, 23, 18, 19);
+DRV8833 motor(MB1, MB2, MA1, MA2);
 
 // Leitura dos sensores
 int leitura[4]; // [0]=esq, [1]=frente-esq, [2]=frente-dir, [3]=dir
@@ -20,17 +20,24 @@ bool alvoDetectado = false; // true = pelo menos um sensor está vendo o oponent
 // Tempo
 unsigned long last_time = 0;
 
+void setupSensores() {
+  pinMode(S3, INPUT);
+  pinMode(S5, INPUT);
+  pinMode(S8, INPUT);
+  pinMode(S2, INPUT);
+}
+
 
 void leituraSensores() {
-  leitura[0] = digitalRead(JEsq);
-  leitura[1] = digitalRead(JFEsq);
-  leitura[2] = digitalRead(JFDir);
-  leitura[3] = digitalRead(JDir);
+  leitura[0] = digitalRead(S3);
+  leitura[1] = digitalRead(S5);
+  leitura[2] = digitalRead(S8);
+  leitura[3] = digitalRead(S2);
 }
 
 void leituraSensoresSD() { // leitura diferente exclusiva pra Seek and Destroy
-  leitura[1] = digitalRead(JFEsq);
-  leitura[2] = digitalRead(JFDir);
+  leitura[1] = digitalRead(S5);
+  leitura[2] = digitalRead(S8);
 }
 
 void calculoErroSensor() {

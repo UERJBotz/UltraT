@@ -8,9 +8,8 @@
 #define LED6 5
 #define LED7 7
 #define LED1 0
-#define PIN 2 //pino do anel de leds
 #define NUMPIXELS 8 // quantidade de leds do anel
-Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800); // necessario
+Adafruit_NeoPixel pixels(NUMPIXELS, LED_STRIP, NEO_GRB + NEO_KHZ800); // necessario
 
 void ledBlink(int r, int g, int b, int time) {    // pisca todas os leds em um intervalo de tempo
   pixels.clear();

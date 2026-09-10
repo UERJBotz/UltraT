@@ -53,8 +53,6 @@ void loop() {
   moduloStart.atualizar();
   motor.update();  // Processa fila de movimentos com timers
 
-  // Detecta o INÍCIO de cada combate pra permitir que o semicírculo do
-  // SeekAndDestroy (estratégias 4 e 5) rode de novo no próximo round
   static bool emCombateAnterior = false;
   bool emCombateAgora = moduloStart.emCombate();
   if (emCombateAgora && !emCombateAnterior) {
@@ -86,8 +84,7 @@ void loop() {
 
     switch (seletorEstrategia.estrategiaAtual()) {
       case ESTRATEGIA_1: iSeeYou();          break;
-      case ESTRATEGIA_2: estadosBobo();      break;
-      // case ESTRATEGIA_2: whiplash();         break;
+      case ESTRATEGIA_2: whiplash();         break;
       case ESTRATEGIA_3: Sharingan();        break;
       case ESTRATEGIA_4: SeekAndDestroy_L(); break;
       case ESTRATEGIA_5: SeekAndDestroy_R(); break;
