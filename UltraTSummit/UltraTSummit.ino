@@ -15,6 +15,7 @@
 #include "LEDFX.h"
 #include "ModuloStart.h"
 #include "SeletorEstrategia.h"
+#include "placa.h"
 
 #define boot 0
 

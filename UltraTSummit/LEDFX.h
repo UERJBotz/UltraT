@@ -2,6 +2,7 @@
 #define ledFX_H
 #include "PID.h"
 #include <Adafruit_NeoPixel.h>
+#include "placa.h"
 
 #define LED4 3
 #define LED5 4
