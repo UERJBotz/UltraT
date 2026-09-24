@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /* ! os sensores do meio na frente tão ligados com esses "pinos" (não usar) ! */
 #define S0 VP
 #define S1 VIN
