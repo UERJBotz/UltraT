@@ -20,14 +20,6 @@ bool alvoDetectado = false; // true = pelo menos um sensor está vendo o oponent
 // Tempo
 unsigned long last_time = 0;
 
-void setupSensores() {
-  pinMode(S3, INPUT);
-  pinMode(S5, INPUT);
-  pinMode(S8, INPUT);
-  pinMode(S2, INPUT);
-}
-
-
 void leituraSensores() {
   leitura[0] = digitalRead(S3);
   leitura[1] = digitalRead(S5);
