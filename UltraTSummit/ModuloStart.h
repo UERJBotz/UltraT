@@ -59,12 +59,11 @@
 #include <IRremoteESP8266.h>
 #include <IRrecv.h>
 #include <IRutils.h>
-#include <Preferences.h>   // NVS — memória flash não volátil do ESP32
+#include <Preferences.h>
+#include "placa.h"   // NVS — memória flash não volátil do ESP32
 
 // ─── Pinos ───────────────────────────────────────────────────
-#define IR_RECV_PIN     15   // Receptor IR (TSOP4838 / VS1838B)
-#define LED_STATUS_PIN   2   // LED de status (pino 2 reservado para NeoPixel)
-#define BTN_LEARN_PIN    0   // Botão BOOT — entra no modo aprendizado
+#define BTN_LEARN_PIN     0   
 // ─────────────────────────────────────────────────────────────
 
 // ─── Parâmetros ──────────────────────────────────────────────
@@ -112,11 +111,11 @@ public:
   //  BEGIN — chame no setup() do .ino (após Serial.begin)
   // ===========================================================
   void begin() {
-    pinMode(LED_STATUS_PIN, OUTPUT);
+    pinMode(LED_STRIP, OUTPUT);
     pinMode(BTN_LEARN_PIN,  INPUT_PULLUP);
-    digitalWrite(LED_STATUS_PIN, LOW);
+    digitalWrite(LED_STRIP, LOW);
 
-    _irrecv = new IRrecv(IR_RECV_PIN);
+    _irrecv = new IRrecv(IR_PIN);
     _irrecv->enableIRIn();
 
     _estado = START_DESLIGADO;
@@ -152,7 +151,7 @@ public:
     switch (_estado) {
       // ── Aguarda PREPARAR ───────────────────────────────────
       case START_DESLIGADO:
-        digitalWrite(LED_STATUS_PIN, LOW);
+        digitalWrite(LED_STRIP, LOW);
         if (codigo != 0 && _ehPreparar(codigo)) {
           _estado = START_PREPARADO;
           _log("PREPARADO — aguardando INICIAR do juiz");
@@ -162,7 +161,7 @@ public:
       // ── Aguarda INICIAR ────────────────────────────────────
       case START_PREPARADO:
         // LED pulsa devagar
-        digitalWrite(LED_STATUS_PIN, (agora / 700) % 2 == 0);
+        digitalWrite(LED_STRIP, (agora / 700) % 2 == 0);
         if (codigo != 0 && _ehPreparar(codigo)) {
           _log("(PREPARAR recebido novamente — ja preparado)");
         }
@@ -173,7 +172,7 @@ public:
           Serial.println("╔══════════════════════════════════════════╗");
           Serial.println("║         >>> COMBATE INICIADO! <<<        ║");
           Serial.println("╚══════════════════════════════════════════╝");
-          digitalWrite(LED_STATUS_PIN, HIGH);
+          digitalWrite(LED_STRIP, HIGH);
         }
         break;
 
@@ -189,12 +188,12 @@ public:
           _log("(INICIAR durante combate — round reiniciado)");
           break;
         }
-        digitalWrite(LED_STATUS_PIN, HIGH);
+        digitalWrite(LED_STRIP, HIGH);
         break;
 
       // ── Parado / emergência ────────────────────────────────
       case START_PARADO:
-        digitalWrite(LED_STATUS_PIN, (agora / 600) % 2 == 0);
+        digitalWrite(LED_STRIP, (agora / 600) % 2 == 0);
         if (codigo != 0 && _ehPreparar(codigo)) {
           _estado = START_PREPARADO;
           _log("PREPARADO — aguardando INICIAR do juiz");
@@ -318,7 +317,7 @@ private:
     _salvarCodigos();
 
     // Confirmação final — LED aceso por 1 segundo
-    digitalWrite(LED_STATUS_PIN, HIGH);
+    digitalWrite(LED_STRIP, HIGH);
     Serial.println();
     Serial.println("══════════════════════════════════════════");
     Serial.println("  APRENDIZADO CONCLUIDO!");
@@ -326,7 +325,7 @@ private:
     Serial.println("  Pode desligar e religar normalmente.");
     Serial.println("══════════════════════════════════════════");
     delay(1000);
-    digitalWrite(LED_STATUS_PIN, LOW);
+    digitalWrite(LED_STRIP, LOW);
 
     _imprimirCodigos();
   }
@@ -342,7 +341,7 @@ private:
     while (millis() - inicio < LEARN_TIMEOUT_MS) {
 
       // LED pisca lentamente enquanto aguarda
-      digitalWrite(LED_STATUS_PIN, (millis() / 400) % 2 == 0);
+      digitalWrite(LED_STRIP, (millis() / 400) % 2 == 0);
 
       if (!_irrecv->decode(&_irResult)) continue;
 
@@ -363,7 +362,7 @@ private:
       }
 
       // Aceito!
-      digitalWrite(LED_STATUS_PIN, LOW);
+      digitalWrite(LED_STRIP, LOW);
       return codigo;
     }
 
@@ -461,10 +460,10 @@ private:
     Serial.println("  Reinicie e tente novamente.");
     // Pisca rápido por 2 segundos para indicar erro
     for (int i = 0; i < 20; i++) {
-      digitalWrite(LED_STATUS_PIN, !digitalRead(LED_STATUS_PIN));
+      digitalWrite(LED_STRIP, !digitalRead(LED_STRIP));
       delay(100);
     }
-    digitalWrite(LED_STATUS_PIN, LOW);
+    digitalWrite(LED_STRIP, LOW);
   }
 
   void _log(const char* msg) {
@@ -475,16 +474,16 @@ private:
 
   void _blink(int n, int ms) {
     for (int i = 0; i < n; i++) {
-      digitalWrite(LED_STATUS_PIN, HIGH); delay(ms);
-      digitalWrite(LED_STATUS_PIN, LOW);  delay(ms);
+      digitalWrite(LED_STRIP, HIGH); delay(ms);
+      digitalWrite(LED_STRIP, LOW);  delay(ms);
     }
   }
 
   // Pisca padrão SOS (3 curto + 3 longo + 3 curto) — sem controle salvo
   void _blinkSOS() {
-    for (int i = 0; i < 3; i++) { digitalWrite(LED_STATUS_PIN, HIGH); delay(150); digitalWrite(LED_STATUS_PIN, LOW); delay(150); }
-    for (int i = 0; i < 3; i++) { digitalWrite(LED_STATUS_PIN, HIGH); delay(400); digitalWrite(LED_STATUS_PIN, LOW); delay(150); }
-    for (int i = 0; i < 3; i++) { digitalWrite(LED_STATUS_PIN, HIGH); delay(150); digitalWrite(LED_STATUS_PIN, LOW); delay(150); }
+    for (int i = 0; i < 3; i++) { digitalWrite(LED_STRIP, HIGH); delay(150); digitalWrite(LED_STRIP, LOW); delay(150); }
+    for (int i = 0; i < 3; i++) { digitalWrite(LED_STRIP, HIGH); delay(400); digitalWrite(LED_STRIP, LOW); delay(150); }
+    for (int i = 0; i < 3; i++) { digitalWrite(LED_STRIP, HIGH); delay(150); digitalWrite(LED_STRIP, LOW); delay(150); }
   }
 };
 
