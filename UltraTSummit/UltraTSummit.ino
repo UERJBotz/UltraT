@@ -80,10 +80,10 @@ void loop() {
     ledLight(0, 255, 0); // LED verde = combate ativo
 
     switch (seletorEstrategia.estrategiaAtual()) {
-      case ESTRATEGIA_1: SeekAndDestroy_L(); break;
+      case ESTRATEGIA_1: iSeeYou();          break;
       case ESTRATEGIA_2: whiplash();         break;
       case ESTRATEGIA_3: Sharingan();        break;
-      case ESTRATEGIA_4: iSeeYou();          break;
+      case ESTRATEGIA_4: SeekAndDestroy_L(); break;
       case ESTRATEGIA_5: SeekAndDestroy_R(); break;
       case ESTRATEGIA_6: paraTras();         break;
       case ESTRATEGIA_0: Calibragem();       break;
