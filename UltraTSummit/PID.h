@@ -3,7 +3,7 @@
 
 
 #include "placa.h"
-#include "DRV8833.h"
+#include <SumoDrive.h>
 
 DRV8833 motor(MB1, MB2, MA1, MA2);
 
@@ -21,15 +21,15 @@ bool alvoDetectado = false; // true = pelo menos um sensor está vendo o oponent
 unsigned long last_time = 0;
 
 void leituraSensores() {
-  leitura[0] = digitalRead(S3);
-  leitura[1] = digitalRead(S5);
-  leitura[2] = digitalRead(S8);
-  leitura[3] = digitalRead(S2);
+  leitura[0] = digitalRead(S5);
+  leitura[1] = digitalRead(S3);
+  leitura[2] = digitalRead(S2);
+  leitura[3] = digitalRead(S8);
 }
 
 void leituraSensoresSD() { // leitura diferente exclusiva pra Seek and Destroy
-  leitura[1] = digitalRead(S5);
-  leitura[2] = digitalRead(S8);
+  leitura[1] = digitalRead(S3);
+  leitura[2] = digitalRead(S2);
 }
 
 void calculoErroSensor() {

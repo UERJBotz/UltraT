@@ -16,8 +16,6 @@
 #include "ModuloStart.h"
 #include "SeletorEstrategia.h"
 
-#define boot 0
-
 void setup() {
   Serial.begin(115200);
   motor.begin();
@@ -25,7 +23,6 @@ void setup() {
   setupPortas();
   pixels.begin();
   pixels.setBrightness(40); // 0 (apagado) a 255 (máximo) — ajuste aqui pra calibrar o brilho
-  pinMode(boot, INPUT_PULLUP);
 }
 
 void LED_Estrategias() {
@@ -83,10 +80,10 @@ void loop() {
     ledLight(0, 255, 0); // LED verde = combate ativo
 
     switch (seletorEstrategia.estrategiaAtual()) {
-      case ESTRATEGIA_1: iSeeYou();          break;
+      case ESTRATEGIA_1: SeekAndDestroy_L(); break;
       case ESTRATEGIA_2: whiplash();         break;
       case ESTRATEGIA_3: Sharingan();        break;
-      case ESTRATEGIA_4: SeekAndDestroy_L(); break;
+      case ESTRATEGIA_4: iSeeYou();          break;
       case ESTRATEGIA_5: SeekAndDestroy_R(); break;
       case ESTRATEGIA_6: paraTras();         break;
       case ESTRATEGIA_0: Calibragem();       break;
