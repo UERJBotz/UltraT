@@ -24,10 +24,19 @@ void leituraSensores() {
   leitura[0] = digitalRead(S5);
   leitura[1] = digitalRead(S3);
   leitura[2] = digitalRead(S2);
-  leitura[3] = digitalRead(S8);
+  leitura[3] = digitalRead(S4);
+  leitura[4] = digitalRead(S6);
+  leitura[5] = digitalRead(S8);
 }
 
-void leituraSensoresSD() { // leitura diferente exclusiva pra Seek and Destroy
+void leituraSensoresSDLeft() { // leitura diferente exclusiva pra Seek and Destroy
+  leitura[1] = digitalRead(S3);
+  leitura[2] = digitalRead(S2);
+  leitura[3] = digitalRead(S4);
+}
+
+void leituraSensoresSDRight() { // leitura diferente exclusiva pra Seek and Destroy
+  leitura[0] = digitalRead(S5);
   leitura[1] = digitalRead(S3);
   leitura[2] = digitalRead(S2);
 }
