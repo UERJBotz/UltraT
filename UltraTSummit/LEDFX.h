@@ -87,13 +87,21 @@ void ledDetection() {
   if (leitura[2]) {
     Serial.println("DIREITA FRONTAL DETECTADO");
     pixels.setPixelColor(LED4, pixels.Color(0, 0, 150));
-    pixels.setPixelColor((LED4 - 1) % NUMPIXELS, pixels.Color(0, 0, 150));
+    pixels.setPixelColor((LED4 - 1)   , pixels.Color(0, 0, 150));
   }
 
   if (leitura[3]) {
     Serial.println("DIREITA LATERAL DETECTADO");
     pixels.setPixelColor(LED1, pixels.Color(0, 150, 0));
     pixels.setPixelColor((LED1 + 1) % NUMPIXELS, pixels.Color(0, 150, 0));
+  }
+  if (leitura[4]) {
+    Serial.println("LINHA ESQUERDA DETECTADO");
+    pixels.setPixelColor(LED7, pixels.Color(0, 0, 150));
+  }
+  if (leitura[5]) {
+    Serial.println("LINHA DIREITA DETECTADO");
+    pixels.setPixelColor(LED1, pixels.Color(0, 0, 150));
   }
   pixels.show();
   delay(10);

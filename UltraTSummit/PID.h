@@ -39,7 +39,6 @@ void leituraSensoresSDRight() { // leitura diferente exclusiva pra Seek and Dest
   leitura[0] = digitalRead(S5);
   leitura[1] = digitalRead(S3);
   leitura[2] = digitalRead(S2);
->>>>>>> 23306846a577b61bdf80b0cd58ebf721ab516d6b
 }
 
 void calculoErroSensor() {
