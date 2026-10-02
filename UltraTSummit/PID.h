@@ -22,14 +22,24 @@ unsigned long last_time = 0;
 
 void leituraSensores() {
   leitura[0] = digitalRead(S5);
-  leitura[1] = digitalRead(S7);
-  leitura[2] = digitalRead(S3);
-  leitura[3] = digitalRead(S2);
+  leitura[1] = digitalRead(S3);
+  leitura[2] = digitalRead(S2);
+  leitura[3] = digitalRead(S4);
+  leitura[4] = digitalRead(S6);
+  leitura[5] = digitalRead(S8);
 }
 
-void leituraSensoresSD() { // leitura diferente exclusiva pra Seek and Destroy
-  leitura[1] = digitalRead(S7);
-  leitura[2] = digitalRead(S3);
+void leituraSensoresSDLeft() { // leitura diferente exclusiva pra Seek and Destroy
+  leitura[1] = digitalRead(S3);
+  leitura[2] = digitalRead(S2);
+  leitura[3] = digitalRead(S4);
+}
+
+void leituraSensoresSDRight() { // leitura diferente exclusiva pra Seek and Destroy
+  leitura[0] = digitalRead(S5);
+  leitura[1] = digitalRead(S3);
+  leitura[2] = digitalRead(S2);
+>>>>>>> 23306846a577b61bdf80b0cd58ebf721ab516d6b
 }
 
 void calculoErroSensor() {
