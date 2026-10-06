@@ -14,33 +14,34 @@ void paraTras() { // estratégia número 6 no controle
 }
 
 
+#define SEEK_VEL_GIRO  600   // velocidade do giro ao detectar a linha — CALIBRE AQUI
 
-
-#define KP_SEEK     100.0  // ganho deste PID — CALIBRE AQUI (bem menor que o Kp=450 do iSeeYou, de propósito)
-#define PESO_LINHA    6.0  // peso do sensor de linha no erro — CALIBRE AQUI (quanto maior, mais forte o desvio da borda)
-
-float calculoErroSeekL() { // pesos de calculoErroSensor() + peso do sensor de linha
+float calculoErroSeekL() { // mesmos pesos de calculoErroSensor(), sem o lateral-esq
   float soma = 0; int ativos = 0;
-  if (leitura[1]) { soma += -2;        ativos++; } // frontal esquerda
-  if (leitura[2]) { soma +=  2;        ativos++; } // frontal direita
-  if (leitura[3]) { soma +=  4;        ativos++; } // lateral direita
-  if (leitura[4]) { soma +=  PESO_LINHA; ativos++; } // linha esquerda -> empurra pra DIREITA (lado oposto)
+  if (leitura[1]) { soma += -2; ativos++; } // frontal esquerda
+  if (leitura[2]) { soma +=  2; ativos++; } // frontal direita
+  if (leitura[3]) { soma +=  4; ativos++; } // lateral direita
   return (ativos > 0) ? (soma / ativos) : 0;
 }
 
-float calculoErroSeekR() { // pesos de calculoErroSensor() + peso do sensor de linha
+float calculoErroSeekR() { // mesmos pesos de calculoErroSensor(), sem o lateral-dir
   float soma = 0; int ativos = 0;
-  if (leitura[0]) { soma += -4;         ativos++; } // lateral esquerda
-  if (leitura[1]) { soma += -2;         ativos++; } // frontal esquerda
-  if (leitura[2]) { soma +=  2;         ativos++; } // frontal direita
-  if (leitura[5]) { soma += -PESO_LINHA; ativos++; } // linha direita -> empurra pra ESQUERDA (lado oposto)
+  if (leitura[0]) { soma += -4; ativos++; } // lateral esquerda
+  if (leitura[1]) { soma += -2; ativos++; } // frontal esquerda
+  if (leitura[2]) { soma +=  2; ativos++; } // frontal direita
   return (ativos > 0) ? (soma / ativos) : 0;
 }
 
 void SeekAndDestroy_L(){ // estratégia número 4 no controle
   leituraSensoresSDLeft();
 
-  float pid_local = KP_SEEK * calculoErroSeekL();
+  if (leitura[4]) { // linha ESQUERDA acionada -> gira pra DIREITA (lado oposto)
+    Serial.println("SeekAndDestroy_L: linha ESQUERDA -> girando p/ DIREITA");
+    motor.move(SEEK_VEL_GIRO, -SEEK_VEL_GIRO);
+    return;
+  }
+
+  float pid_local = Kp * calculoErroSeekL(); // reaproveita o Kp já calibrado do PID principal
   int velocidade_esq = constrain((int)(vel_base + pid_local), -1023, 1023);
   int velocidade_dir = constrain((int)(vel_base - pid_local), -1023, 1023);
   motor.move(velocidade_esq, velocidade_dir); // nada detectado -> pid_local=0 -> anda reto em vel_base
@@ -49,7 +50,13 @@ void SeekAndDestroy_L(){ // estratégia número 4 no controle
 void SeekAndDestroy_R(){ // estratégia número 5 no controle
   leituraSensoresSDRight();
 
-  float pid_local = KP_SEEK * calculoErroSeekR();
+  if (leitura[5]) { // linha DIREITA acionada -> gira pra ESQUERDA (lado oposto)
+    Serial.println("SeekAndDestroy_R: linha DIREITA -> girando p/ ESQUERDA");
+    motor.move(-SEEK_VEL_GIRO, SEEK_VEL_GIRO);
+    return;
+  }
+
+  float pid_local = Kp * calculoErroSeekR();
   int velocidade_esq = constrain((int)(vel_base + pid_local), -1023, 1023);
   int velocidade_dir = constrain((int)(vel_base - pid_local), -1023, 1023);
   motor.move(velocidade_esq, velocidade_dir);
