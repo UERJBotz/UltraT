@@ -14,10 +14,28 @@ void paraTras() { // estratégia número 6 no controle
 }
 
 
+// ============================================================
+//  SeekAndDestroy — PID de aproximação com desvio de linha
+// ============================================================
+//  Cada variante lê um subconjunto de 4 sensores (3 "de oponente" +
+//  1 "de linha", do próprio lado):
+//    SeekAndDestroy_L (estratégia 4): frontal-esq, frontal-dir, lateral-DIR, linha-ESQ
+//    SeekAndDestroy_R (estratégia 5): lateral-ESQ, frontal-esq, frontal-dir, linha-DIR
+//
+//  O sensor de linha entra como mais um peso na média do erro (igual
+//  aos de oponente), não como um "if" separado — o desvio sai suave,
+//  proporcional, dentro do próprio PID, igual aos outros sensores.
+//
+//  IMPORTANTE: esse PID usa um ganho PRÓPRIO (KP_SEEK), bem menor que
+//  o Kp do iSeeYou (450). Lá o erro vira o diferencial inteiro das
+//  rodas; aqui ele é SOMADO a vel_base — usar o mesmo Kp=450 fazia até
+//  um único sensor fraco (peso 2) virar uma correção de 900, maior que
+//  a própria vel_base (550), e o robô parecia começar girando em vez
+//  de curvar suave. CALIBRE KP_SEEK e PESO_LINHA abaixo.
+// ============================================================
 
-
-#define KP_SEEK     200.0  // ganho deste PID — CALIBRE AQUI (bem menor que o Kp=450 do iSeeYou, de propósito)
-#define PESO_LINHA    3.0  // peso do sensor de linha no erro — CALIBRE AQUI (quanto maior, mais forte o desvio da borda)
+#define KP_SEEK     100.0  // ganho deste PID — CALIBRE AQUI (bem menor que o Kp=450 do iSeeYou, de propósito)
+#define PESO_LINHA    6.0  // peso do sensor de linha no erro — CALIBRE AQUI (quanto maior, mais forte o desvio da borda)
 
 float calculoErroSeekL() { // pesos de calculoErroSensor() + peso do sensor de linha
   float soma = 0; int ativos = 0;
@@ -37,8 +55,26 @@ float calculoErroSeekR() { // pesos de calculoErroSensor() + peso do sensor de l
   return (ativos > 0) ? (soma / ativos) : 0;
 }
 
+bool _SND_L_travado = false; // uma vez true, SeekAndDestroy_L só chama iSeeYou() até o fim do round
+bool _SND_R_travado = false; // idem pro SeekAndDestroy_R
+
+// Chame no início de cada round/combate pra destravar as duas estratégias de novo
+void resetSeekAndDestroy() {
+  _SND_L_travado = false;
+  _SND_R_travado = false;
+}
+
 void SeekAndDestroy_L(){ // estratégia número 4 no controle
   leituraSensoresSDLeft();
+
+  if (!_SND_L_travado && leitura[1] && leitura[2]) {
+    _SND_L_travado = true; // trava: só destrava de novo no próximo round (resetSeekAndDestroy)
+  }
+
+  if (_SND_L_travado) {
+    iSeeYou();
+    return;
+  }
 
   float pid_local = KP_SEEK * calculoErroSeekL();
   int velocidade_esq = constrain((int)(vel_base + pid_local), -1023, 1023);
@@ -48,6 +84,15 @@ void SeekAndDestroy_L(){ // estratégia número 4 no controle
 
 void SeekAndDestroy_R(){ // estratégia número 5 no controle
   leituraSensoresSDRight();
+
+  if (!_SND_R_travado && leitura[1] && leitura[2]) {
+    _SND_R_travado = true;
+  }
+
+  if (_SND_R_travado) {
+    iSeeYou();
+    return;
+  }
 
   float pid_local = KP_SEEK * calculoErroSeekR();
   int velocidade_esq = constrain((int)(vel_base + pid_local), -1023, 1023);

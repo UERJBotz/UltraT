@@ -130,8 +130,8 @@ void Calibragem() { // MODO TESTE DE CALIBRAMENTO DO PID
     return;
   }
 
-  int velocidade_esq =  - PID;
-  int velocidade_dir =  + PID;
+  int velocidade_esq =  + PID;
+  int velocidade_dir =  - PID;
 
   velocidade_esq = constrain(velocidade_esq, -1023, 1023);
   velocidade_dir = constrain(velocidade_dir, -1023, 1023);

@@ -50,6 +50,13 @@ void loop() {
   moduloStart.atualizar();
   motor.update();  // Processa fila de movimentos com timers
 
+  static bool emCombateAnterior = false;
+  bool emCombateAgora = moduloStart.emCombate();
+  if (emCombateAgora && !emCombateAnterior) {
+    resetSeekAndDestroy(); // destrava o SeekAndDestroy_L/_R pro novo round
+  }
+  emCombateAnterior = emCombateAgora;
+
   // ── DESLIGADO: antes do PREPARAR ─────────────────────────
   if (moduloStart.desligado()) {
     LED_Estrategias();
