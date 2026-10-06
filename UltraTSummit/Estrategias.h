@@ -14,55 +14,33 @@ void paraTras() { // estratégia número 6 no controle
 }
 
 
-// ============================================================
-//  SeekAndDestroy — PID de aproximação com desvio de linha
-// ============================================================
-//  Cada variante lê um subconjunto de 4 sensores (3 "de oponente" +
-//  1 "de linha", do próprio lado):
-//    SeekAndDestroy_L (estratégia 4): frontal-esq, frontal-dir, lateral-DIR, linha-ESQ
-//    SeekAndDestroy_R (estratégia 5): lateral-ESQ, frontal-esq, frontal-dir, linha-DIR
-//
-//  Prioridade (nessa ordem):
-//   1. Sensor de linha do próprio lado acionado -> IGNORA tudo o mais e
-//      gira no próprio eixo pro lado OPOSTO (ex.: linha esquerda viu a
-//      borda -> gira pra direita). Sair da arena é pior que não atacar,
-//      por isso isso tem prioridade sobre o PID de oponente.
-//   2. Sem linha acionada -> PID proporcional (mesmos pesos de
-//      calculoErroSensor(), só que com os 3 sensores de oponente dessa
-//      variante) somado a vel_base, então o robô sempre avança enquanto
-//      ajusta a mira — nada detectado -> erro fica 0 -> os dois lados
-//      ficam em vel_base -> anda reto pra frente (é o "inicialmente vai
-//      pra frente" pedido).
-// ============================================================
 
-#define SEEK_VEL_GIRO  600   // velocidade do giro ao detectar a linha — CALIBRE AQUI
 
-float calculoErroSeekL() { // mesmos pesos de calculoErroSensor(), sem o lateral-esq
+#define KP_SEEK     100.0  // ganho deste PID — CALIBRE AQUI (bem menor que o Kp=450 do iSeeYou, de propósito)
+#define PESO_LINHA    6.0  // peso do sensor de linha no erro — CALIBRE AQUI (quanto maior, mais forte o desvio da borda)
+
+float calculoErroSeekL() { // pesos de calculoErroSensor() + peso do sensor de linha
   float soma = 0; int ativos = 0;
-  if (leitura[1]) { soma += -2; ativos++; } // frontal esquerda
-  if (leitura[2]) { soma +=  2; ativos++; } // frontal direita
-  if (leitura[3]) { soma +=  4; ativos++; } // lateral direita
+  if (leitura[1]) { soma += -2;        ativos++; } // frontal esquerda
+  if (leitura[2]) { soma +=  2;        ativos++; } // frontal direita
+  if (leitura[3]) { soma +=  4;        ativos++; } // lateral direita
+  if (leitura[4]) { soma +=  PESO_LINHA; ativos++; } // linha esquerda -> empurra pra DIREITA (lado oposto)
   return (ativos > 0) ? (soma / ativos) : 0;
 }
 
-float calculoErroSeekR() { // mesmos pesos de calculoErroSensor(), sem o lateral-dir
+float calculoErroSeekR() { // pesos de calculoErroSensor() + peso do sensor de linha
   float soma = 0; int ativos = 0;
-  if (leitura[0]) { soma += -4; ativos++; } // lateral esquerda
-  if (leitura[1]) { soma += -2; ativos++; } // frontal esquerda
-  if (leitura[2]) { soma +=  2; ativos++; } // frontal direita
+  if (leitura[0]) { soma += -4;         ativos++; } // lateral esquerda
+  if (leitura[1]) { soma += -2;         ativos++; } // frontal esquerda
+  if (leitura[2]) { soma +=  2;         ativos++; } // frontal direita
+  if (leitura[5]) { soma += -PESO_LINHA; ativos++; } // linha direita -> empurra pra ESQUERDA (lado oposto)
   return (ativos > 0) ? (soma / ativos) : 0;
 }
 
 void SeekAndDestroy_L(){ // estratégia número 4 no controle
   leituraSensoresSDLeft();
 
-  if (leitura[4]) { // linha ESQUERDA acionada -> gira pra DIREITA (lado oposto)
-    Serial.println("SeekAndDestroy_L: linha ESQUERDA -> girando p/ DIREITA");
-    motor.move(SEEK_VEL_GIRO, -SEEK_VEL_GIRO);
-    return;
-  }
-
-  float pid_local = Kp * calculoErroSeekL(); // reaproveita o Kp já calibrado do PID principal
+  float pid_local = KP_SEEK * calculoErroSeekL();
   int velocidade_esq = constrain((int)(vel_base + pid_local), -1023, 1023);
   int velocidade_dir = constrain((int)(vel_base - pid_local), -1023, 1023);
   motor.move(velocidade_esq, velocidade_dir); // nada detectado -> pid_local=0 -> anda reto em vel_base
@@ -71,13 +49,7 @@ void SeekAndDestroy_L(){ // estratégia número 4 no controle
 void SeekAndDestroy_R(){ // estratégia número 5 no controle
   leituraSensoresSDRight();
 
-  if (leitura[5]) { // linha DIREITA acionada -> gira pra ESQUERDA (lado oposto)
-    Serial.println("SeekAndDestroy_R: linha DIREITA -> girando p/ ESQUERDA");
-    motor.move(-SEEK_VEL_GIRO, SEEK_VEL_GIRO);
-    return;
-  }
-
-  float pid_local = Kp * calculoErroSeekR();
+  float pid_local = KP_SEEK * calculoErroSeekR();
   int velocidade_esq = constrain((int)(vel_base + pid_local), -1023, 1023);
   int velocidade_dir = constrain((int)(vel_base - pid_local), -1023, 1023);
   motor.move(velocidade_esq, velocidade_dir);
