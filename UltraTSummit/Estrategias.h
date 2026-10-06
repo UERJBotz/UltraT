@@ -16,7 +16,7 @@ void paraTras() { // estratégia número 6 no controle
 
 
 
-#define KP_SEEK     100.0  // ganho deste PID — CALIBRE AQUI (bem menor que o Kp=450 do iSeeYou, de propósito)
+#define KP_SEEK     200.0  // ganho deste PID — CALIBRE AQUI (bem menor que o Kp=450 do iSeeYou, de propósito)
 #define PESO_LINHA    3.0  // peso do sensor de linha no erro — CALIBRE AQUI (quanto maior, mais forte o desvio da borda)
 
 float calculoErroSeekL() { // pesos de calculoErroSensor() + peso do sensor de linha
