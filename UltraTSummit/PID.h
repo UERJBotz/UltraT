@@ -8,8 +8,7 @@
 DRV8833 motor(MB1, MB2, MA1, MA2);
 
 // Leitura dos sensores
-int leitura[4]; // [0]=esq, [1]=frente-esq, [2]=frente-dir, [3]=dir
-
+int leitura[6]; // [0]=lateral-esq, [1]=frontal-esq, [2]=frontal-dir, [3]=lateral-dir, [4]=linha-esq, [5]=linha-dir
 // Velocidades e parâmetros PID
 int vel_base = 550;
 float erro_linha = 0, erro_linha_anterior = 0;
@@ -25,20 +24,22 @@ void leituraSensores() {
   leitura[1] = digitalRead(S3);
   leitura[2] = digitalRead(S2);
   leitura[3] = digitalRead(S4);
-  leitura[4] = digitalRead(S6);
-  leitura[5] = digitalRead(S8);
+  leitura[4] = !digitalRead(S6); 
+  leitura[5] = !digitalRead(S8); 
 }
 
-void leituraSensoresSDLeft() { // leitura diferente exclusiva pra Seek and Destroy
+void leituraSensoresSDLeft() { // leitura exclusiva pra SeekAndDestroy_L: frontal-esq, frontal-dir, lateral-dir, linha-esq
   leitura[1] = digitalRead(S3);
   leitura[2] = digitalRead(S2);
   leitura[3] = digitalRead(S4);
+  leitura[4] = !digitalRead(S6); 
 }
 
-void leituraSensoresSDRight() { // leitura diferente exclusiva pra Seek and Destroy
+void leituraSensoresSDRight() { // leitura exclusiva pra SeekAndDestroy_R: lateral-esq, frontal-esq, frontal-dir, linha-dir
   leitura[0] = digitalRead(S5);
   leitura[1] = digitalRead(S3);
   leitura[2] = digitalRead(S2);
+  leitura[5] = !digitalRead(S8); // linha direita — invertido
 }
 
 void calculoErroSensor() {
@@ -87,11 +88,25 @@ void pid() {
 void iSeeYou() { // não é uma estratégia e sim o ataque principal, mas pode ser selecionada no número 4 no controle, deve ser considerada a principal
   leituraSensores();
   pid();
+  bool inimigoEmCheio = (leitura[1] && leitura[2]);
 
+  if (!inimigoEmCheio) {
+    if (leitura[4]) { // Linha Esquerda detectada
+      motor.move_for(1023, -1023, 100); 
+      return; 
+    }
+    else if (leitura[5]) { // Linha Direita detectada
+      motor.move_for(-1023, 1023, 100); 
+      return; 
+    }
+  }
+
+  
   if (!alvoDetectado) {
     motor.stop(); // sem nenhum sensor vendo o oponente -> fica parado, não gira à toa
     return;
   }
+  
 
   int velocidade_esq =  + PID;
   int velocidade_dir =  - PID;

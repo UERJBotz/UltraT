@@ -50,13 +50,6 @@ void loop() {
   moduloStart.atualizar();
   motor.update();  // Processa fila de movimentos com timers
 
-  static bool emCombateAnterior = false;
-  bool emCombateAgora = moduloStart.emCombate();
-  if (emCombateAgora && !emCombateAnterior) {
-    resetSeekAndDestroy();
-  }
-  emCombateAnterior = emCombateAgora;
-
   // ── DESLIGADO: antes do PREPARAR ─────────────────────────
   if (moduloStart.desligado()) {
     LED_Estrategias();
