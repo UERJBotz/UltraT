@@ -5,13 +5,13 @@
 #define S1 VIN
 /* ! ^^^^ ! */
 
-#define S2 34  //frontal direita
-#define S3 35  //frontal esquerda
-#define S4 32  //lateral direita
-#define S5 33  //lateral esquerda
-#define S6 25  //linha esquerda
+#define S2 34
+#define S3 35
+#define S4 32
+#define S5 33
+#define S6 25
 #define S7 27
-#define S8 14  //linha direita
+#define S8 14
 
 #define IR_PIN 15
 #define LED_STRIP 2
@@ -24,13 +24,20 @@
 #define MB1 4
 #define MB2 23
 
+#define S_ESQ S5
+#define S_DIR S4
+#define S_FESQ S3
+#define S_FDIR S2
+#define LI_ESQ S6
+#define LI_DIR S8
+
 void setupPortas() {
-  pinMode(S3, INPUT);
-  pinMode(S5, INPUT);
-  pinMode(S8, INPUT);
-  pinMode(S2, INPUT);
-  pinMode(S4, INPUT);
-  pinMode(S6, INPUT);
+  pinMode(S_ESQ, INPUT);
+  pinMode(S_DIR, INPUT);
+  pinMode(S_FESQ, INPUT);
+  pinMode(S_FDIR, INPUT);
+  pinMode(LI_ESQ, INPUT);
+  pinMode(LI_DIR, INPUT);
   pinMode(LED_STRIP, OUTPUT);
 }
 

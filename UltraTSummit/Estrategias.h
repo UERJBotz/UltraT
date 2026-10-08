@@ -4,6 +4,8 @@
 #include "PID.h"
 
 #define VEL_SEEK 600
+#define VEL_CONTORNO_MIN 600
+#define VEL_CONTORNO_MAX 800
 
 void paraTras() { // estratégia número 6 no controle
   // Usa timers não-bloqueantes em vez de delay()
@@ -13,52 +15,11 @@ void paraTras() { // estratégia número 6 no controle
   iSeeYou();
 }
 
-
-int      SND_L_EXTERNO    = 1023;
-int      SND_L_INTERNO    = 650;   // CALIBRE AQUI — curvatura da busca ESQUERDA
-uint32_t SND_L_DURACAO_MS = 800;   // CALIBRE AQUI — duração do semicírculo esquerdo (ms)
-
-int      SND_R_EXTERNO    = 1023;
-int      SND_R_INTERNO    = 300;   // CALIBRE AQUI — curvatura da busca DIREITA
-uint32_t SND_R_DURACAO_MS = 800;   // CALIBRE AQUI — duração do semicírculo direito (ms)
-
-bool _SND_L_feito = false;
-bool _SND_R_feito = false;
-
-
 void resetSeekAndDestroy() {
-  _SND_L_feito = false;
-  _SND_R_feito = false;
+  //noop
 }
 
-void _semicirculoBloqueante(int vl, int vr, uint32_t duracao_ms) {
-  motor.move_for(vl, vr, duracao_ms);
-  delay(duracao_ms); // segura aqui até o tempo do movimento passar
-}
-
-void SeekAndDestroy_L(){ // estratégia número 4 no controle — busca pela lateral ESQUERDA
-  if (!_SND_L_feito) {
-    Serial.println("SeekAndDestroy_L: executando semicirculo (bloqueante)...");
-    _semicirculoBloqueante(SND_L_INTERNO, SND_L_EXTERNO, SND_L_DURACAO_MS);
-    _SND_L_feito = true;
-    Serial.println("SeekAndDestroy_L: semicirculo concluido -> PID (iSeeYou)");
-  }
-  iSeeYou(); // depois do semicírculo, PID assume o resto do round
-}
-
-void SeekAndDestroy_R(){ // estratégia número 5 no controle — busca pela lateral DIREITA
-  if (!_SND_R_feito) {
-    Serial.println("SeekAndDestroy_R: executando semicirculo (bloqueante)...");
-    _semicirculoBloqueante(SND_R_EXTERNO, SND_R_INTERNO, SND_R_DURACAO_MS);
-    _SND_R_feito = true;
-    Serial.println("SeekAndDestroy_R: semicirculo concluido -> PID (iSeeYou)");
-  }
-  iSeeYou();
-}
-
-void estadosBobo() {
-  leituraSensores();
-
+void __estadosBobo() {
   enum ESTADO_BOBO {
     BOBO_SEM_INIMIGO,
     BOBO_INIMIGO_FRENTE,
@@ -109,6 +70,77 @@ void estadosBobo() {
       motor.move(VEL_SEEK, -VEL_SEEK);
       break;
   }
+}
+
+void PID_Contorno() {
+  leituraSensores(); pid();
+  if (!alvoDetectado) return;
+
+  uint16_t velocidade_esq = constrain(+PID, -1023, 1023);
+  uint16_t velocidade_dir = constrain(-PID, -1023, 1023);
+
+  if (PID == 0) { //! epsilon
+    motor.move(1023, 1023); // alvo detectado e perfeitamente centralizado -> avança em linha reta
+  } else {
+    motor.move(velocidade_esq, velocidade_dir);
+  }
+}
+
+void ContornarLPID() {
+  leituraSensoresConservadora();
+
+  enum ESTADO_BOBO {
+    BOBO_SEM_INIMIGO,
+    BOBO_INIMIGO,
+  } estadoAtual = BOBO_SEM_INIMIGO; // sem inimigo
+
+  if (leitura[0] || leitura[1] || leitura[2] || leitura[3]) { // enxergando com qualquer sensor
+    estadoAtual = BOBO_INIMIGO;
+  } else {
+    estadoAtual = BOBO_SEM_INIMIGO; // sem inimigo
+  }
+
+  switch (estadoAtual) {
+    case BOBO_INIMIGO: PID_Contorno(); break;
+
+    case BOBO_SEM_INIMIGO: {
+      Serial.println("Contornando");
+      if      (leitura[5]) motor.move(-VEL_CONTORNO_MAX, VEL_CONTORNO_MAX);
+      else if (leitura[4]) motor.move( VEL_CONTORNO_MAX,-VEL_CONTORNO_MAX);
+      else                 motor.move( VEL_CONTORNO_MAX, VEL_CONTORNO_MIN);
+    } break;
+  }
+}
+
+void ContornarL() {
+  leituraSensoresConservadora();
+
+  enum ESTADO_BOBO {
+    BOBO_SEM_INIMIGO,
+    BOBO_INIMIGO,
+  } estadoAtual = BOBO_SEM_INIMIGO; // sem inimigo
+
+  if (leitura[0] || leitura[1] || leitura[2] || leitura[3]) { // enxergando com qualquer sensor
+    estadoAtual = BOBO_INIMIGO;
+  } else {
+    estadoAtual = BOBO_SEM_INIMIGO; // sem inimigo
+  }
+
+  switch (estadoAtual) {
+    case BOBO_INIMIGO: __estadosBobo(); break;
+
+    case BOBO_SEM_INIMIGO: {
+      Serial.println("Contornando");
+      if      (leitura[5]) motor.move(-VEL_CONTORNO_MAX, VEL_CONTORNO_MAX);
+      else if (leitura[4]) motor.move( VEL_CONTORNO_MAX,-VEL_CONTORNO_MAX);
+      else                 motor.move( VEL_CONTORNO_MAX, VEL_CONTORNO_MIN);
+    } break;
+  }
+}
+
+void estadosBobo() {
+  leituraSensores();
+  __estadosBobo();
 }
 
 #endif

@@ -8,7 +8,7 @@
 DRV8833 motor(MB1, MB2, MA1, MA2);
 
 // Leitura dos sensores
-int leitura[4]; // [0]=esq, [1]=frente-esq, [2]=frente-dir, [3]=dir
+int leitura[6]; // [0]=esq, [1]=frente-esq, [2]=frente-dir, [3]=dir, [4]=linha-esq, [5]=linha-dir
 
 // Velocidades e parâmetros PID
 int vel_base = 550;
@@ -21,24 +21,38 @@ bool alvoDetectado = false; // true = pelo menos um sensor está vendo o oponent
 unsigned long last_time = 0;
 
 void leituraSensores() {
-  leitura[0] = digitalRead(S5);
-  leitura[1] = digitalRead(S3);
-  leitura[2] = digitalRead(S2);
-  leitura[3] = digitalRead(S4);
-  leitura[4] = digitalRead(S6);
-  leitura[5] = digitalRead(S8);
+  leitura[4] = !digitalRead(LI_ESQ);
+  leitura[5] = !digitalRead(LI_DIR);
+
+  leitura[0] = digitalRead(S_ESQ);
+  leitura[1] = digitalRead(S_FESQ);
+  leitura[2] = digitalRead(S_FDIR);
+  leitura[3] = digitalRead(S_DIR);
+}
+void leituraSensoresConservadora() {
+  leituraSensores();
+  if (leitura[4]) leitura[0] = false;
+  if (leitura[5]) leitura[3] = false;
 }
 
 void leituraSensoresSDLeft() { // leitura diferente exclusiva pra Seek and Destroy
-  leitura[1] = digitalRead(S3);
-  leitura[2] = digitalRead(S2);
-  leitura[3] = digitalRead(S4);
+  leitura[0] = false;
+  leitura[1] = digitalRead(S_FESQ);
+  leitura[2] = digitalRead(S_FDIR);
+  leitura[3] = digitalRead(S_DIR);
+
+  leitura[4] = false;
+  leitura[5] = false;
 }
 
 void leituraSensoresSDRight() { // leitura diferente exclusiva pra Seek and Destroy
-  leitura[0] = digitalRead(S5);
-  leitura[1] = digitalRead(S3);
-  leitura[2] = digitalRead(S2);
+  leitura[0] = digitalRead(S_ESQ);
+  leitura[1] = digitalRead(S_FESQ);
+  leitura[2] = digitalRead(S_FDIR);
+  leitura[3] = false;
+
+  leitura[4] = false;
+  leitura[5] = false;
 }
 
 void calculoErroSensor() {
