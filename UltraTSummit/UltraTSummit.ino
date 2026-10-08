@@ -1,10 +1,6 @@
 /*
-  16/11/2025, para a summit;
-  Auto e RC usando ESPNOW;
-  Alimentar o ESP32 C3 Mini do rádio pistola com um power bank ou um celular, as pilhas podem não dar conta,
-  afetando a direção do robô;
-
-  https://github.com/TRZN11/UltraT/blob/main/UltraTSummit
+  desde 16/11/2025, para a summit;
+  https://github.com/TRZN11/UltraT/
 */
 
 #include "SumoDrive.h"
@@ -80,13 +76,13 @@ void loop() {
     ledLight(0, 255, 0); // LED verde = combate ativo
 
     switch (seletorEstrategia.estrategiaAtual()) {
-      case ESTRATEGIA_1: iSeeYou();          break;
-      case ESTRATEGIA_2: whiplash();         break;
-      case ESTRATEGIA_3: Sharingan();        break;
-      case ESTRATEGIA_4: SeekAndDestroy_L(); break;
-      case ESTRATEGIA_5: SeekAndDestroy_R(); break;
-      case ESTRATEGIA_6: paraTras();         break;
-      case ESTRATEGIA_0: Calibragem();       break;
+      case ESTRATEGIA_1: iSeeYou();       break; // BOTÃO 4
+      case ESTRATEGIA_2: whiplash();      break; // BOTÃO 5
+      case ESTRATEGIA_3: Sharingan();     break; // BOTÃO 6
+      case ESTRATEGIA_4: ContornarL();    break; // BOTÃO 7
+      case ESTRATEGIA_5: ContornarLPID(); break; // BOTÃO 8
+      case ESTRATEGIA_6: paraTras();      break; // BOTÃO 9
+      case ESTRATEGIA_0: Calibragem();    break; // BOTÃO 0
     }
   }
   else if (moduloStart.preparado()) {

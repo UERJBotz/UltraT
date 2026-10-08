@@ -8,7 +8,8 @@
 DRV8833 motor(MB1, MB2, MA1, MA2);
 
 // Leitura dos sensores
-int leitura[6]; // [0]=lateral-esq, [1]=frontal-esq, [2]=frontal-dir, [3]=lateral-dir, [4]=linha-esq, [5]=linha-dir
+int leitura[6]; // [0]=esq, [1]=frente-esq, [2]=frente-dir, [3]=dir, [4]=linha-esq, [5]=linha-dir
+
 // Velocidades e parâmetros PID
 int vel_base = 550;
 float erro_linha = 0, erro_linha_anterior = 0;
@@ -20,26 +21,29 @@ bool alvoDetectado = false; // true = pelo menos um sensor está vendo o oponent
 unsigned long last_time = 0;
 
 void leituraSensores() {
-  leitura[0] = digitalRead(S5);
-  leitura[1] = digitalRead(S3);
-  leitura[2] = digitalRead(S2);
-  leitura[3] = digitalRead(S4);
-  leitura[4] = !digitalRead(S6); 
-  leitura[5] = !digitalRead(S8); 
+  leitura[0] = digitalRead(S_ESQ);
+  leitura[1] = digitalRead(S_FESQ);
+  leitura[2] = digitalRead(S_FDIR);
+  leitura[3] = digitalRead(S_DIR);
+
+  leitura[4] = !digitalRead(LI_ESQ);
+  leitura[5] = !digitalRead(LI_DIR);
 }
 
-void leituraSensoresSDLeft() { // leitura exclusiva pra SeekAndDestroy_L: frontal-esq, frontal-dir, lateral-dir, linha-esq
-  leitura[1] = digitalRead(S3);
-  leitura[2] = digitalRead(S2);
-  leitura[3] = digitalRead(S4);
-  leitura[4] = !digitalRead(S6); 
+void leituraSensoresConservadora() {
+  leituraSensores();
+  if (leitura[4]) leitura[0] = false;
+  if (leitura[5]) leitura[3] = false;
 }
 
-void leituraSensoresSDRight() { // leitura exclusiva pra SeekAndDestroy_R: lateral-esq, frontal-esq, frontal-dir, linha-dir
-  leitura[0] = digitalRead(S5);
-  leitura[1] = digitalRead(S3);
-  leitura[2] = digitalRead(S2);
-  leitura[5] = !digitalRead(S8); // linha direita — invertido
+void leituraSensoresSDLeft() { // leitura diferente exclusiva pra SeekAndDestroy_L
+  leituraSensores();
+  leitura[0] = leitura[5] = false;
+}
+
+void leituraSensoresSDRight() { // leitura diferente exclusiva pra SeekAndDestroy_R
+  leituraSensores();
+  leitura[3] = leitura[4] = false;
 }
 
 void calculoErroSensor() {
@@ -101,15 +105,13 @@ void iSeeYou() { // não é uma estratégia e sim o ataque principal, mas pode s
     }
   }
 
-  
   if (!alvoDetectado) {
     motor.stop(); // sem nenhum sensor vendo o oponente -> fica parado, não gira à toa
     return;
   }
-  
 
-  int velocidade_esq =  + PID;
-  int velocidade_dir =  - PID;
+  int velocidade_esq = + PID;
+  int velocidade_dir = - PID;
 
   velocidade_esq = constrain(velocidade_esq, -1023, 1023);
   velocidade_dir = constrain(velocidade_dir, -1023, 1023);
@@ -130,8 +132,8 @@ void Calibragem() { // MODO TESTE DE CALIBRAMENTO DO PID
     return;
   }
 
-  int velocidade_esq =  + PID;
-  int velocidade_dir =  - PID;
+  int velocidade_esq = + PID;
+  int velocidade_dir = - PID;
 
   velocidade_esq = constrain(velocidade_esq, -1023, 1023);
   velocidade_dir = constrain(velocidade_dir, -1023, 1023);

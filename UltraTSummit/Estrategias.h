@@ -4,15 +4,15 @@
 #include "PID.h"
 
 #define VEL_SEEK 600
+#define VEL_CONTORNO_MIN 600
+#define VEL_CONTORNO_MAX 800
 
-void paraTras() { // estratégia número 6 no controle
+void paraTras() {
   // Usa timers não-bloqueantes em vez de delay()
-  // Move para frente por 500ms, depois para trás por 350ms, depois executa iSeeYou
   motor.move_for_then(1023, 1023, 500,
-                      -1023, 1023, 350);
+                     -1023, 1023, 350);
   iSeeYou();
 }
-
 
 // ============================================================
 //  SeekAndDestroy — PID de aproximação com desvio de linha
@@ -39,18 +39,18 @@ void paraTras() { // estratégia número 6 no controle
 
 float calculoErroSeekL() { // pesos de calculoErroSensor() + peso do sensor de linha
   float soma = 0; int ativos = 0;
-  if (leitura[1]) { soma += -2;        ativos++; } // frontal esquerda
-  if (leitura[2]) { soma +=  2;        ativos++; } // frontal direita
-  if (leitura[3]) { soma +=  4;        ativos++; } // lateral direita
+  if (leitura[1]) { soma += -2;          ativos++; } // frontal esquerda
+  if (leitura[2]) { soma +=  2;          ativos++; } // frontal direita
+  if (leitura[3]) { soma +=  4;          ativos++; } // lateral direita
   if (leitura[4]) { soma +=  PESO_LINHA; ativos++; } // linha esquerda -> empurra pra DIREITA (lado oposto)
   return (ativos > 0) ? (soma / ativos) : 0;
 }
 
 float calculoErroSeekR() { // pesos de calculoErroSensor() + peso do sensor de linha
   float soma = 0; int ativos = 0;
-  if (leitura[0]) { soma += -4;         ativos++; } // lateral esquerda
-  if (leitura[1]) { soma += -2;         ativos++; } // frontal esquerda
-  if (leitura[2]) { soma +=  2;         ativos++; } // frontal direita
+  if (leitura[0]) { soma += -4;          ativos++; } // lateral esquerda
+  if (leitura[1]) { soma += -2;          ativos++; } // frontal esquerda
+  if (leitura[2]) { soma +=  2;          ativos++; } // frontal direita
   if (leitura[5]) { soma += -PESO_LINHA; ativos++; } // linha direita -> empurra pra ESQUERDA (lado oposto)
   return (ativos > 0) ? (soma / ativos) : 0;
 }
@@ -64,7 +64,7 @@ void resetSeekAndDestroy() {
   _SND_R_travado = false;
 }
 
-void SeekAndDestroy_L(){ // estratégia número 4 no controle
+void SeekAndDestroy_L(){
   leituraSensoresSDLeft();
 
   if (!_SND_L_travado && leitura[1] && leitura[2]) {
@@ -82,7 +82,7 @@ void SeekAndDestroy_L(){ // estratégia número 4 no controle
   motor.move(velocidade_esq, velocidade_dir); // nada detectado -> pid_local=0 -> anda reto em vel_base
 }
 
-void SeekAndDestroy_R(){ // estratégia número 5 no controle
+void SeekAndDestroy_R(){
   leituraSensoresSDRight();
 
   if (!_SND_R_travado && leitura[1] && leitura[2]) {
@@ -100,9 +100,7 @@ void SeekAndDestroy_R(){ // estratégia número 5 no controle
   motor.move(velocidade_esq, velocidade_dir);
 }
 
-void estadosBobo() {
-  leituraSensores();
-
+void __estadosBobo() {
   enum ESTADO_BOBO {
     BOBO_SEM_INIMIGO,
     BOBO_INIMIGO_FRENTE,
@@ -153,6 +151,77 @@ void estadosBobo() {
       motor.move(VEL_SEEK, -VEL_SEEK);
       break;
   }
+}
+
+void PID_Contorno() {
+  leituraSensores(); pid();
+  if (!alvoDetectado) return;
+
+  uint16_t velocidade_esq = constrain(+PID, -1023, 1023);
+  uint16_t velocidade_dir = constrain(-PID, -1023, 1023);
+
+  if (PID == 0) { //! epsilon
+    motor.move(1023, 1023); // alvo detectado e perfeitamente centralizado -> avança em linha reta
+  } else {
+    motor.move(velocidade_esq, velocidade_dir);
+  }
+}
+
+void ContornarLPID() {
+  leituraSensoresConservadora();
+
+  enum ESTADO_BOBO {
+    BOBO_SEM_INIMIGO,
+    BOBO_INIMIGO,
+  } estadoAtual = BOBO_SEM_INIMIGO; // sem inimigo
+
+  if (leitura[0] || leitura[1] || leitura[2] || leitura[3]) { // enxergando com qualquer sensor
+    estadoAtual = BOBO_INIMIGO;
+  } else {
+    estadoAtual = BOBO_SEM_INIMIGO; // sem inimigo
+  }
+
+  switch (estadoAtual) {
+    case BOBO_INIMIGO: PID_Contorno(); break;
+
+    case BOBO_SEM_INIMIGO: {
+      Serial.println("Contornando");
+      if      (leitura[5]) motor.move(-VEL_CONTORNO_MAX, VEL_CONTORNO_MAX);
+      else if (leitura[4]) motor.move( VEL_CONTORNO_MAX,-VEL_CONTORNO_MAX);
+      else                 motor.move( VEL_CONTORNO_MAX, VEL_CONTORNO_MIN);
+    } break;
+  }
+}
+
+void ContornarL() {
+  leituraSensoresConservadora();
+
+  enum ESTADO_BOBO {
+    BOBO_SEM_INIMIGO,
+    BOBO_INIMIGO,
+  } estadoAtual = BOBO_SEM_INIMIGO; // sem inimigo
+
+  if (leitura[0] || leitura[1] || leitura[2] || leitura[3]) { // enxergando com qualquer sensor
+    estadoAtual = BOBO_INIMIGO;
+  } else {
+    estadoAtual = BOBO_SEM_INIMIGO; // sem inimigo
+  }
+
+  switch (estadoAtual) {
+    case BOBO_INIMIGO: __estadosBobo(); break;
+
+    case BOBO_SEM_INIMIGO: {
+      Serial.println("Contornando");
+      if      (leitura[5]) motor.move(-VEL_CONTORNO_MAX, VEL_CONTORNO_MAX);
+      else if (leitura[4]) motor.move( VEL_CONTORNO_MAX,-VEL_CONTORNO_MAX);
+      else                 motor.move( VEL_CONTORNO_MAX, VEL_CONTORNO_MIN);
+    } break;
+  }
+}
+
+void estadosBobo() {
+  leituraSensores();
+  __estadosBobo();
 }
 
 #endif
