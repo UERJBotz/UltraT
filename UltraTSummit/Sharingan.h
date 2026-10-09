@@ -54,3 +54,5 @@ void Sharingan(){
 }
 
 #endif
+
+//! mover para estratégias

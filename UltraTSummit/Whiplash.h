@@ -11,3 +11,5 @@ void whiplash() {
 }
 
 #endif
+
+//! mover para estratégias

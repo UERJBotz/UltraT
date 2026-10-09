@@ -1,14 +1,13 @@
 #ifndef pid_H
 #define pid_H
 
-
 #include "placa.h"
 #include <SumoDrive.h>
 
 DRV8833 motor(MB1, MB2, MA1, MA2);
 
 // Leitura dos sensores
-int leitura[6]; // [0]=esq, [1]=frente-esq, [2]=frente-dir, [3]=dir, [4]=linha-esq, [5]=linha-dir
+bool leitura[6]; // [0]=esq, [1]=frente-esq, [2]=frente-dir, [3]=dir, [4]=linha-esq, [5]=linha-dir
 
 // Velocidades e parâmetros PID
 int vel_base = 550;

@@ -59,8 +59,8 @@
 #include <IRremoteESP8266.h>
 #include <IRrecv.h>
 #include <IRutils.h>
-#include <Preferences.h>
-#include "placa.h"   // NVS — memória flash não volátil do ESP32
+#include <Preferences.h> // NVS — memória flash não volátil do ESP32
+#include "placa.h"
 
 // ─── Pinos ───────────────────────────────────────────────────
 #define BTN_LEARN_PIN     0   

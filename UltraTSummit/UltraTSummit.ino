@@ -1,6 +1,6 @@
 /*
   desde 16/11/2025, para a summit;
-  https://github.com/TRZN11/UltraT/
+  https://github.com/UERJBotz/UltraT/
 */
 
 #include "SumoDrive.h"
@@ -76,13 +76,13 @@ void loop() {
     ledLight(0, 255, 0); // LED verde = combate ativo
 
     switch (seletorEstrategia.estrategiaAtual()) {
-      case ESTRATEGIA_1: iSeeYou();       break; // BOTÃO 4
-      case ESTRATEGIA_2: whiplash();      break; // BOTÃO 5
-      case ESTRATEGIA_3: Sharingan();     break; // BOTÃO 6
-      case ESTRATEGIA_4: ContornarL();    break; // BOTÃO 7
-      case ESTRATEGIA_5: ContornarLPID(); break; // BOTÃO 8
-      case ESTRATEGIA_6: paraTras();      break; // BOTÃO 9
-      case ESTRATEGIA_0: Calibragem();    break; // BOTÃO 0
+      case ESTRATEGIA_1: iSeeYou();          break; // BOTÃO 4
+      case ESTRATEGIA_2: SeekAndDestroy_R(); break; // BOTÃO 5
+      case ESTRATEGIA_3: SeekAndDestroy_L(); break; // BOTÃO 6
+      case ESTRATEGIA_4: ContornarL();       break; // BOTÃO 7
+      case ESTRATEGIA_5: ContornarLPID();    break; // BOTÃO 8
+      case ESTRATEGIA_6: paraTras();         break; // BOTÃO 9
+      case ESTRATEGIA_0: Calibragem();       break; // BOTÃO 0
     }
   }
   else if (moduloStart.preparado()) {
