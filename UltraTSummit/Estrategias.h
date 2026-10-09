@@ -7,6 +7,10 @@
 #define VEL_CONTORNO_MIN 600
 #define VEL_CONTORNO_MAX 800
 
+void MadMax() {
+  motor.move(1023, 1023);
+}
+
 void paraTras() {
   // Usa timers não-bloqueantes em vez de delay()
   motor.move_for_then(1023, 1023, 500,
