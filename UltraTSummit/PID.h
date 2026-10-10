@@ -25,8 +25,13 @@ void leituraSensores() {
   leitura[2] = digitalRead(S_FDIR);
   leitura[3] = digitalRead(S_DIR);
 
-  leitura[4] = !digitalRead(LI_ESQ);
-  leitura[5] = !digitalRead(LI_DIR);
+  #ifdef LI_ESQ && LI_DIR //! DESABILITAR LINHAS SEPARADO
+    leitura[4] = !digitalRead(LI_ESQ);
+    leitura[5] = !digitalRead(LI_DIR);
+  #else
+    leitura[4] = false;
+    leitura[5] = false;
+  #endif
 }
 
 void leituraSensoresConservadora() {

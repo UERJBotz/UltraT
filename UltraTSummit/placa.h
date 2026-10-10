@@ -1,7 +1,7 @@
 #ifndef placa_H
 #define placa_H
 /* ! os sensores do meio na frente tão ligados com esses "pinos" (não usar) ! */
-#define S0 VP
+#define S0 VP // 5?
 #define S1 VIN
 /* ! ^^^^ ! */
 
@@ -36,8 +36,11 @@ void setupPortas() {
   pinMode(S_DIR, INPUT);
   pinMode(S_FESQ, INPUT);
   pinMode(S_FDIR, INPUT);
-  pinMode(LI_ESQ, INPUT);
-  pinMode(LI_DIR, INPUT);
+
+  #ifdef LI_ESQ && LI_DIR  //! DESABILITAR LINHAS SEPARADO
+    pinMode(LI_ESQ, INPUT);
+    pinMode(LI_DIR, INPUT);
+  #endif
   pinMode(LED_STRIP, OUTPUT);
 }
 
