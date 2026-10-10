@@ -24,12 +24,14 @@
 #define MB1 4
 #define MB2 23
 
-#define S_ESQ S5
-#define S_DIR S4
+#define S_ESQ S7
 #define S_FESQ S3
-#define S_FDIR S2
-#define LI_ESQ S6
-#define LI_DIR S8
+#define S_FDIR D26
+#define S_DIR S8
+
+//! SEM SENSOR DE LINHA
+// #define LI_ESQ S6
+// #define LI_DIR S8
 
 void setupPortas() {
   pinMode(S_ESQ, INPUT);
